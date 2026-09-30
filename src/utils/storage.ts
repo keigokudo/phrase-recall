@@ -8,19 +8,13 @@ import type {
   StudySession,
   StudySessionMode,
 } from '../types'
+import { createId } from './id'
 
 const PACKS_KEY = 'phraseRecall.importedPacks'
 const PROGRESS_KEY = 'phraseRecall.progress'
 const SESSIONS_KEY = 'phraseRecall.studySessions'
 const REVIEWS_KEY = 'phraseRecall.reviewEvents'
 const AUTO_PRONOUNCE_KEY = 'phraseRecall.autoPronounce'
-
-function makeId(prefix: string) {
-  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
-    return `${prefix}-${crypto.randomUUID()}`
-  }
-  return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`
-}
 
 function readArray(key: string): unknown[] {
   try {
@@ -102,7 +96,7 @@ export function saveRating(progress: ProgressMap, phraseId: string, rating: Reca
 
 export function createStudySession(pack: PhrasePack, mode: StudySessionMode): StudySession {
   const session: StudySession = {
-    id: makeId('session'),
+    id: createId('session'),
     packId: pack.id,
     packName: pack.name,
     mode,
@@ -137,14 +131,16 @@ export function loadStudySessions(): StudySession[] {
   })
 }
 
-export function completeStudySession(sessionId: string) {
+export function completeStudySession(sessionId: string): StudySession | undefined {
   const endedAt = new Date().toISOString()
-  const sessions = loadStudySessions().map((session): StudySession => (
-    session.id === sessionId && session.state === 'active'
-      ? { ...session, endedAt, state: 'completed' }
-      : session
-  ))
+  let completed: StudySession | undefined
+  const sessions = loadStudySessions().map((session): StudySession => {
+    if (session.id !== sessionId || session.state !== 'active') return session
+    completed = { ...session, endedAt, state: 'completed' }
+    return completed
+  })
   localStorage.setItem(SESSIONS_KEY, JSON.stringify(sessions))
+  return completed
 }
 
 export function abandonStudySession(sessionId: string) {
@@ -160,7 +156,7 @@ export function abandonStudySession(sessionId: string) {
 export function appendReviewEvent(event: Omit<ReviewEvent, 'id' | 'reviewedAt'>): ReviewEvent {
   const review: ReviewEvent = {
     ...event,
-    id: makeId('review'),
+    id: createId('review'),
     reviewedAt: new Date().toISOString(),
   }
   localStorage.setItem(REVIEWS_KEY, JSON.stringify([...loadReviewEvents(), review]))

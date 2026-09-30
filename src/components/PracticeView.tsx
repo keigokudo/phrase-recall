@@ -1,14 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import type { Phrase, PhrasePack, ProgressMap, RecallRating, StudySession } from '../types'
+import type { Phrase, PhrasePack, ProgressMap, RecallRating, ReviewMeasurement, StudySession } from '../types'
 import { speakAnswer, stopAnswerSpeech } from '../utils/speech'
-
-interface ReviewMeasurement {
-  phraseId: string
-  rating: RecallRating
-  round: number
-  cueToRevealMs: number
-  revealToRatingMs: number
-}
 
 interface Props {
   pack: PhrasePack

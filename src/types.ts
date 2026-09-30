@@ -66,3 +66,55 @@ export interface ReviewEvent {
   cueToRevealMs: number
   revealToRatingMs?: number
 }
+
+export interface ReviewMeasurement {
+  phraseId: string
+  rating: RecallRating
+  round: number
+  cueToRevealMs: number
+  revealToRatingMs: number
+}
+
+export interface SessionResultReview {
+  id: string
+  round: number
+  rating: RecallRating
+  cueToRevealMs: number
+  revealToRatingMs?: number
+  reviewedAt: string
+}
+
+export interface SessionPhraseResult {
+  phraseId: string
+  cue: string
+  answer: string
+  latestRating: RecallRating
+  needsReview: boolean
+  reviews: SessionResultReview[]
+}
+
+export interface SessionResultReport {
+  schemaVersion: 1
+  type: 'phrase-recall-session-result'
+  session: {
+    id: string
+    packId: string
+    pack: string
+    source: string
+    languages: PackLanguages
+    mode: StudySessionMode
+    startedAt: string
+    endedAt: string
+    rounds: number
+  }
+  summary: {
+    uniquePhrases: number
+    totalReviews: number
+    again: number
+    hard: number
+    good: number
+    easy: number
+    averageCueToRevealMs: number
+  }
+  results: SessionPhraseResult[]
+}

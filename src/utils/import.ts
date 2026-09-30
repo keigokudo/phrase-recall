@@ -1,4 +1,5 @@
 import type { ImportedPhrasePack, PackLanguages, Phrase, PhrasePack } from '../types'
+import { createId } from './id'
 
 export const PHRASE_PACK_EXAMPLE = `{
   "schemaVersion": 1,
@@ -31,13 +32,6 @@ Rules:
 - Preserve natural spelling, accents, apostrophes, and punctuation.
 - Produce the number of phrases requested by the user.`
 
-function makeId(prefix: 'phrase' | 'pack') {
-  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
-    return `${prefix}-${crypto.randomUUID()}`
-  }
-  return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`
-}
-
 function validateRows(rows: unknown[]): Phrase[] {
   if (!rows.length) throw new Error('The phrase pack does not contain any phrases.')
   return rows.map((row, index) => {
@@ -46,7 +40,7 @@ function validateRows(rows: unknown[]): Phrase[] {
     if (typeof cue !== 'string' || typeof answer !== 'string' || !cue.trim() || !answer.trim()) {
       throw new Error(`Phrase ${index + 1} must contain non-empty "cue" and "answer" values.`)
     }
-    return { id: makeId('phrase'), cue: cue.trim(), answer: answer.trim() }
+    return { id: createId('phrase'), cue: cue.trim(), answer: answer.trim() }
   })
 }
 
@@ -63,7 +57,7 @@ function readLanguages(value: unknown): PackLanguages {
 
 function createPack(data: ImportedPhrasePack): PhrasePack {
   return {
-    id: makeId('pack'),
+    id: createId('pack'),
     schemaVersion: 1,
     name: data.name.trim(),
     source: data.source.trim(),

@@ -3,8 +3,9 @@ import './App.css'
 import { ImportPanel } from './components/ImportPanel'
 import { PackCard } from './components/PackCard'
 import { PracticeView } from './components/PracticeView'
+import { SessionResults } from './components/SessionResults'
 import { samplePack } from './data/samplePack'
-import type { Phrase, PhrasePack, ProgressMap, RecallRating, StudySession } from './types'
+import type { Phrase, PhrasePack, ProgressMap, ReviewEvent, ReviewMeasurement, StudySession } from './types'
 import {
   abandonStudySession,
   appendReviewEvent,
@@ -13,21 +14,29 @@ import {
   loadAutoPronounce,
   loadImportedPacks,
   loadProgress,
+  loadReviewEvents,
   saveAutoPronounce,
   saveImportedPacks,
   saveRating,
 } from './utils/storage'
 
-interface Session {
+interface ActiveSession {
   studySession: StudySession
   pack: PhrasePack
   phrases: Phrase[]
 }
 
+interface CompletedSession {
+  studySession: StudySession
+  pack: PhrasePack
+  reviews: ReviewEvent[]
+}
+
 export default function App() {
   const [importedPacks, setImportedPacks] = useState<PhrasePack[]>(loadImportedPacks)
   const [progress, setProgress] = useState<ProgressMap>(loadProgress)
-  const [session, setSession] = useState<Session | null>(null)
+  const [session, setSession] = useState<ActiveSession | null>(null)
+  const [completedSession, setCompletedSession] = useState<CompletedSession | null>(null)
   const [autoPronounce, setAutoPronounce] = useState(loadAutoPronounce)
 
   const packs = useMemo(() => [samplePack, ...importedPacks], [importedPacks])
@@ -38,13 +47,7 @@ export default function App() {
     saveImportedPacks(next)
   }
 
-  function handleReview(measurement: {
-    phraseId: string
-    rating: RecallRating
-    round: number
-    cueToRevealMs: number
-    revealToRatingMs: number
-  }) {
+  function handleReview(measurement: ReviewMeasurement) {
     if (!session) return
     appendReviewEvent({
       sessionId: session.studySession.id,
@@ -61,12 +64,17 @@ export default function App() {
       : pack.phrases
     if (!phrases.length) return
     const studySession = createStudySession(pack, difficultOnly ? 'difficult' : 'full')
+    setCompletedSession(null)
     setSession({ studySession, pack, phrases })
   }
 
   function finishSession() {
     if (!session) return
-    completeStudySession(session.studySession.id)
+    const completed = completeStudySession(session.studySession.id)
+    if (completed) {
+      const reviews = loadReviewEvents().filter((review) => review.sessionId === completed.id)
+      setCompletedSession({ studySession: completed, pack: session.pack, reviews })
+    }
     setSession(null)
   }
 
@@ -93,6 +101,17 @@ export default function App() {
         onReview={handleReview}
         onFinish={finishSession}
         onExit={exitSession}
+      />
+    )
+  }
+
+  if (completedSession) {
+    return (
+      <SessionResults
+        session={completedSession.studySession}
+        pack={completedSession.pack}
+        reviews={completedSession.reviews}
+        onBack={() => setCompletedSession(null)}
       />
     )
   }
