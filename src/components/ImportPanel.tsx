@@ -84,10 +84,16 @@ export function ImportPanel({ onImport }: { onImport: (pack: PhrasePack) => void
             </button>
           </div>
           {copied && <p className="copy-confirmation" role="status">AI prompt copied</p>}
+          {showFormat && (
+            <div className="format-example">
+              <p className="eyebrow">PhraseRecall JSON format</p>
+              <pre><code>{PHRASE_PACK_EXAMPLE}</code></pre>
+            </div>
+          )}
         </div>
       </div>
 
-      <div>
+      <div className="import-content">
         <form onSubmit={submitPastedJson} className="import-form">
           <label>
             PhraseRecall JSON
@@ -106,13 +112,6 @@ export function ImportPanel({ onImport }: { onImport: (pack: PhrasePack) => void
           {error && <p className="error" role="alert">{error}</p>}
           <button className="primary" type="submit">Import pasted JSON</button>
         </form>
-
-        {showFormat && (
-          <div className="format-example">
-            <p className="eyebrow">PhraseRecall JSON format</p>
-            <pre><code>{PHRASE_PACK_EXAMPLE}</code></pre>
-          </div>
-        )}
 
         <details className="file-import">
           <summary>Import a JSON or CSV file instead</summary>

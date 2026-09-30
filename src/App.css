@@ -154,6 +154,8 @@ button:hover:not(:disabled) { transform: translateY(-1px); }
   padding: 32px;
 }
 
+.import-intro, .import-content { min-width: 0; }
+
 .import-form { display: grid; gap: 16px; }
 
 .import-form label {
@@ -202,6 +204,7 @@ button:hover:not(:disabled) { transform: translateY(-1px); }
 }
 
 .format-example {
+  min-width: 0;
   margin-top: 20px;
   padding: 18px;
   border: 1px solid #d9d6ce;
