@@ -4,10 +4,22 @@ import { ImportPanel } from './components/ImportPanel'
 import { PackCard } from './components/PackCard'
 import { PracticeView } from './components/PracticeView'
 import { samplePack } from './data/samplePack'
-import type { Phrase, PhrasePack, ProgressMap, RecallRating } from './types'
-import { loadImportedPacks, loadProgress, saveImportedPacks, saveRating } from './utils/storage'
+import type { Phrase, PhrasePack, ProgressMap, RecallRating, StudySession } from './types'
+import {
+  abandonStudySession,
+  appendReviewEvent,
+  completeStudySession,
+  createStudySession,
+  loadAutoPronounce,
+  loadImportedPacks,
+  loadProgress,
+  saveAutoPronounce,
+  saveImportedPacks,
+  saveRating,
+} from './utils/storage'
 
 interface Session {
+  studySession: StudySession
   pack: PhrasePack
   phrases: Phrase[]
 }
@@ -16,6 +28,7 @@ export default function App() {
   const [importedPacks, setImportedPacks] = useState<PhrasePack[]>(loadImportedPacks)
   const [progress, setProgress] = useState<ProgressMap>(loadProgress)
   const [session, setSession] = useState<Session | null>(null)
+  const [autoPronounce, setAutoPronounce] = useState(loadAutoPronounce)
 
   const packs = useMemo(() => [samplePack, ...importedPacks], [importedPacks])
 
@@ -25,7 +38,20 @@ export default function App() {
     saveImportedPacks(next)
   }
 
-  function handleRate(phraseId: string, rating: RecallRating) {
+  function handleReview(measurement: {
+    phraseId: string
+    rating: RecallRating
+    round: number
+    cueToRevealMs: number
+    revealToRatingMs: number
+  }) {
+    if (!session) return
+    appendReviewEvent({
+      sessionId: session.studySession.id,
+      packId: session.pack.id,
+      ...measurement,
+    })
+    const { phraseId, rating } = measurement
     setProgress((current) => saveRating(current, phraseId, rating))
   }
 
@@ -33,7 +59,26 @@ export default function App() {
     const phrases = difficultOnly
       ? pack.phrases.filter((phrase) => progress[phrase.id]?.status === 'difficult')
       : pack.phrases
-    setSession({ pack, phrases })
+    if (!phrases.length) return
+    const studySession = createStudySession(pack, difficultOnly ? 'difficult' : 'full')
+    setSession({ studySession, pack, phrases })
+  }
+
+  function finishSession() {
+    if (!session) return
+    completeStudySession(session.studySession.id)
+    setSession(null)
+  }
+
+  function exitSession() {
+    if (!session) return
+    abandonStudySession(session.studySession.id)
+    setSession(null)
+  }
+
+  function handleAutoPronounceChange(value: boolean) {
+    setAutoPronounce(value)
+    saveAutoPronounce(value)
   }
 
   if (session) {
@@ -42,8 +87,12 @@ export default function App() {
         pack={session.pack}
         phrases={session.phrases}
         progress={progress}
-        onRate={handleRate}
-        onExit={() => setSession(null)}
+        session={session.studySession}
+        autoPronounce={autoPronounce}
+        onAutoPronounceChange={handleAutoPronounceChange}
+        onReview={handleReview}
+        onFinish={finishSession}
+        onExit={exitSession}
       />
     )
   }

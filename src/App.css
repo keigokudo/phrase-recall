@@ -252,6 +252,20 @@ footer {
 
 .practice-header .eyebrow { margin-bottom: 3px; text-align: right; }
 
+.practice-meta { text-align: right; }
+
+.tts-preference {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 10px;
+  color: #5e5a53;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.tts-preference input { margin: 0; }
+
 .text-button {
   padding: 8px 0;
   background: transparent;
@@ -287,6 +301,14 @@ footer {
   font-size: 1rem;
 }
 
+.key-hint {
+  margin-left: 6px;
+  color: inherit;
+  font-size: 0.72rem;
+  font-weight: 400;
+  opacity: 0.72;
+}
+
 .answer-block {
   margin-top: auto;
   padding-top: 72px;
@@ -300,9 +322,22 @@ footer {
   letter-spacing: -0.03em;
 }
 
+.answer-tools {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.replay-button {
+  flex: 0 0 auto;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 .rating-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 10px;
   margin-top: 28px;
 }
@@ -325,6 +360,19 @@ footer {
   font-weight: 400;
 }
 
+.rating-grid kbd {
+  float: right;
+  min-width: 20px;
+  border: 1px solid #d6d2c9;
+  border-radius: 5px;
+  padding: 1px 5px;
+  background: #fff;
+  color: #777269;
+  font: inherit;
+  font-size: 0.7rem;
+  text-align: center;
+}
+
 .empty-state {
   max-width: 760px;
   margin: 70px auto;
@@ -333,6 +381,8 @@ footer {
 
 .empty-state .muted { margin: 20px 0 28px; }
 
+.round-complete .button-row { margin-top: 0; }
+
 @media (max-width: 760px) {
   .shell { width: min(100% - 24px, 1120px); padding-top: 20px; }
   .hero, .import-panel { grid-template-columns: 1fr; padding: 28px; gap: 28px; }
@@ -340,5 +390,7 @@ footer {
   .pack-grid { grid-template-columns: 1fr; }
   .section-heading { margin-top: 40px; }
   .practice-card { min-height: calc(100vh - 130px); padding: 30px 24px; }
+  .practice-header { gap: 20px; }
+  .answer-tools { align-items: start; flex-direction: column; }
   .rating-grid { grid-template-columns: 1fr; }
 }

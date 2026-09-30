@@ -1,5 +1,7 @@
-export type RecallRating = 'again' | 'hard' | 'got-it'
+export type RecallRating = 'again' | 'hard' | 'good' | 'easy'
 export type PhraseStatus = 'new' | 'difficult' | 'learned'
+export type StudySessionMode = 'full' | 'difficult'
+export type StudySessionState = 'active' | 'completed' | 'abandoned'
 
 export interface Phrase {
   id: string
@@ -41,3 +43,26 @@ export interface PhraseProgress {
 }
 
 export type ProgressMap = Record<string, PhraseProgress>
+
+export interface StudySession {
+  id: string
+  packId: string
+  packName: string
+  mode: StudySessionMode
+  startedAt: string
+  endedAt?: string
+  abandonedAt?: string
+  state: StudySessionState
+}
+
+export interface ReviewEvent {
+  id: string
+  sessionId: string
+  packId: string
+  phraseId: string
+  reviewedAt: string
+  round: number
+  rating: RecallRating
+  cueToRevealMs: number
+  revealToRatingMs?: number
+}

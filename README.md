@@ -12,10 +12,14 @@ Phrase lists are easy to collect and easy to reread, but rereading does not forc
 - Paste AI-generated PhraseRecall JSON directly into the app
 - Import custom phrase packs from JSON or CSV files
 - Practice cue-first, then reveal the answer
-- Rate each phrase as **Again**, **Hard**, or **Got it**
+- Rate each phrase as **Again**, **Hard**, **Good**, or **Easy**
 - Track new, difficult, and learned phrases in localStorage
 - See simple learned progress for each pack
 - Practice difficult phrases only
+- Retry difficult phrases in additional rounds while preserving every review attempt
+- Measure cue-to-reveal recall time for each review
+- Automatically pronounce answers with the browser's speech synthesis
+- Use keyboard shortcuts for revealing, rating, and replaying audio
 - Responsive, keyboard-accessible interface
 - No account, backend, database, or external API
 
@@ -99,4 +103,4 @@ Potential extensions, not implemented in the current MVP:
 
 ## Notes
 
-PhraseRecall deliberately avoids a complex scheduling algorithm. A rating currently maps a phrase to either `difficult` or `learned`, while untouched phrases remain `new`.
+PhraseRecall deliberately avoids a complex scheduling algorithm. **Again** and **Hard** map a phrase to `difficult`; **Good** and **Easy** map it to `learned`, while untouched phrases remain `new`. Study sessions, immutable review events, progress, and the auto-pronunciation preference are stored locally in the browser.
