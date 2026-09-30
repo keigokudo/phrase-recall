@@ -2,7 +2,10 @@ import type { PhrasePack } from '../types'
 
 export const samplePack: PhrasePack = {
   id: 'sample-french-basics',
+  schemaVersion: 1,
   name: 'French Everyday Basics',
+  source: '',
+  languages: { cue: 'en', answer: 'fr' },
   builtIn: true,
   phrases: [
     { id: 'sample-1', cue: 'What are you doing tonight?', answer: "Qu'est-ce que vous allez faire ce soir ?" },

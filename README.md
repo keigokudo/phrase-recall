@@ -9,7 +9,8 @@ Phrase lists are easy to collect and easy to reread, but rereading does not forc
 ## Features
 
 - Built-in sample French phrase pack with original generic phrases
-- Import custom phrase packs from JSON or CSV
+- Paste AI-generated PhraseRecall JSON directly into the app
+- Import custom phrase packs from JSON or CSV files
 - Practice cue-first, then reveal the answer
 - Rate each phrase as **Again**, **Hard**, or **Got it**
 - Track new, difficult, and learned phrases in localStorage
@@ -41,18 +42,29 @@ npm run build
 
 ## Import format
 
-Enter a pack name in the import form, then select either a `.json` or `.csv` file.
+Paste a PhraseRecall JSON object directly into the import form. The app generates internal pack and phrase IDs, so imported data does not need IDs or timestamps.
 
 ### JSON
 
 ```json
-[
-  {
-    "cue": "What are you doing tonight?",
-    "answer": "Qu'est-ce que vous allez faire ce soir ?"
-  }
-]
+{
+  "schemaVersion": 1,
+  "name": "Everyday French",
+  "source": "Lesson notes",
+  "languages": {
+    "cue": "en",
+    "answer": "fr"
+  },
+  "phrases": [
+    {
+      "cue": "What are you doing tonight?",
+      "answer": "Qu'est-ce que vous allez faire ce soir ?"
+    }
+  ]
+}
 ```
+
+The previous JSON array format remains supported. Enter a pack name in the form when importing a legacy array. JSON files also support both formats.
 
 ### CSV
 

@@ -163,14 +163,71 @@ button:hover:not(:disabled) { transform: translateY(-1px); }
   font-weight: 650;
 }
 
-.import-form input {
+.import-form input, .import-form textarea {
   width: 100%;
   border: 1px solid #cfcbc2;
   border-radius: 10px;
   padding: 12px 13px;
   background: #fff;
   color: #1d1d1a;
+  font: inherit;
 }
+
+.import-form textarea {
+  min-height: 280px;
+  resize: vertical;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.label-note {
+  color: #817c73;
+  font-size: 0.78rem;
+  font-weight: 400;
+}
+
+.ai-tools { margin-top: 28px; }
+
+.ai-tools > p { margin: 0; font-weight: 650; }
+
+.ai-tools .button-row { margin-top: 12px; }
+
+.format-button { padding: 10px 4px; text-decoration: underline; text-underline-offset: 3px; }
+
+.copy-confirmation {
+  margin: 12px 0 0;
+  color: #4f6950;
+  font-size: 0.88rem;
+}
+
+.format-example {
+  margin-top: 20px;
+  padding: 18px;
+  border: 1px solid #d9d6ce;
+  border-radius: 12px;
+  background: #f4f2ed;
+}
+
+.format-example pre {
+  overflow-x: auto;
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.55;
+  white-space: pre;
+}
+
+.file-import {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #d9d6ce;
+}
+
+.file-import summary { cursor: pointer; color: #4d4a44; font-weight: 650; }
+
+.file-import .import-form { margin-top: 18px; }
+
+.file-import .muted { font-size: 0.82rem; }
 
 .error {
   margin: 0;

@@ -7,9 +7,30 @@ export interface Phrase {
   answer: string
 }
 
+export interface PackLanguages {
+  cue: string
+  answer: string
+}
+
+export interface ImportedPhrase {
+  cue: string
+  answer: string
+}
+
+export interface ImportedPhrasePack {
+  schemaVersion: 1
+  name: string
+  source: string
+  languages: PackLanguages
+  phrases: ImportedPhrase[]
+}
+
 export interface PhrasePack {
   id: string
+  schemaVersion: 1
   name: string
+  source: string
+  languages: PackLanguages
   phrases: Phrase[]
   builtIn?: boolean
 }
