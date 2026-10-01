@@ -71,6 +71,32 @@ export function saveImportedPacks(packs: PhrasePack[]) {
   localStorage.setItem(PACKS_KEY, JSON.stringify(packs))
 }
 
+export function deleteImportedPack(packId: string): {
+  deleted: boolean
+  importedPacks: PhrasePack[]
+  progress: ProgressMap
+} {
+  const importedPacks = loadImportedPacks()
+  const progress = loadProgress()
+  const pack = importedPacks.find((candidate) => candidate.id === packId && !candidate.builtIn)
+  if (!pack) return { deleted: false, importedPacks, progress }
+
+  const phraseIds = new Set(pack.phrases.map((phrase) => phrase.id))
+  const nextPacks = importedPacks.filter((candidate) => candidate.id !== packId)
+  const nextProgress = Object.fromEntries(
+    Object.entries(progress).filter(([phraseId]) => !phraseIds.has(phraseId)),
+  ) as ProgressMap
+  const nextSessions = loadStudySessions().filter((session) => session.packId !== packId)
+  const nextReviews = loadReviewEvents().filter((review) => review.packId !== packId)
+
+  localStorage.setItem(PACKS_KEY, JSON.stringify(nextPacks))
+  localStorage.setItem(PROGRESS_KEY, JSON.stringify(nextProgress))
+  localStorage.setItem(SESSIONS_KEY, JSON.stringify(nextSessions))
+  localStorage.setItem(REVIEWS_KEY, JSON.stringify(nextReviews))
+
+  return { deleted: true, importedPacks: nextPacks, progress: nextProgress }
+}
+
 export function loadProgress(): ProgressMap {
   try {
     const stored: unknown = JSON.parse(localStorage.getItem(PROGRESS_KEY) ?? '{}')

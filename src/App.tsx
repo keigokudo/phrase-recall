@@ -11,6 +11,7 @@ import {
   appendReviewEvent,
   completeStudySession,
   createStudySession,
+  deleteImportedPack,
   loadAutoPronounce,
   loadImportedPacks,
   loadProgress,
@@ -56,6 +57,19 @@ export default function App() {
     })
     const { phraseId, rating } = measurement
     setProgress((current) => saveRating(current, phraseId, rating))
+  }
+
+  function handleDeletePack(pack: PhrasePack) {
+    if (pack.builtIn) return
+    const confirmed = window.confirm(
+      `Delete “${pack.name}”?\n\nThis will permanently delete this pack and its local study history.`,
+    )
+    if (!confirmed) return
+
+    const result = deleteImportedPack(pack.id)
+    if (!result.deleted) return
+    setImportedPacks(result.importedPacks)
+    setProgress(result.progress)
   }
 
   function startPractice(pack: PhrasePack, difficultOnly = false) {
@@ -144,7 +158,7 @@ export default function App() {
 
       <section className="pack-grid" aria-label="Phrase packs">
         {packs.map((pack) => (
-          <PackCard key={pack.id} pack={pack} progress={progress} onStart={startPractice} />
+          <PackCard key={pack.id} pack={pack} progress={progress} onStart={startPractice} onDelete={handleDeletePack} />
         ))}
       </section>
 

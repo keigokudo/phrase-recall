@@ -4,9 +4,10 @@ interface Props {
   pack: PhrasePack
   progress: ProgressMap
   onStart: (pack: PhrasePack, difficultOnly?: boolean) => void
+  onDelete: (pack: PhrasePack) => void
 }
 
-export function PackCard({ pack, progress, onStart }: Props) {
+export function PackCard({ pack, progress, onStart, onDelete }: Props) {
   const learned = pack.phrases.filter((phrase) => progress[phrase.id]?.status === 'learned').length
   const difficult = pack.phrases.filter((phrase) => progress[phrase.id]?.status === 'difficult').length
   const percent = pack.phrases.length ? Math.round((learned / pack.phrases.length) * 100) : 0
@@ -27,6 +28,11 @@ export function PackCard({ pack, progress, onStart }: Props) {
       <div className="button-row">
         <button className="primary" onClick={() => onStart(pack)}>Start practice</button>
         <button className="secondary" onClick={() => onStart(pack, true)} disabled={!difficult}>Difficult only</button>
+        {!pack.builtIn && (
+          <button className="text-button delete-button" type="button" aria-label={`Delete ${pack.name}`} onClick={() => onDelete(pack)}>
+            Delete
+          </button>
+        )}
       </div>
     </article>
   )

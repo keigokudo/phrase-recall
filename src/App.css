@@ -146,6 +146,14 @@ button:hover:not(:disabled) { transform: translateY(-1px); }
 
 .secondary:hover:not(:disabled) { border-color: #aaa59b; }
 
+.delete-button {
+  margin-left: auto;
+  color: #8b4039;
+  font-size: 0.88rem;
+}
+
+.delete-button:hover { color: #702a24; }
+
 .import-panel {
   display: grid;
   grid-template-columns: 1fr 1.2fr;
