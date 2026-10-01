@@ -7,6 +7,7 @@ export interface Phrase {
   id: string
   cue: string
   answer: string
+  ipa?: string
 }
 
 export interface PackLanguages {
@@ -17,6 +18,7 @@ export interface PackLanguages {
 export interface ImportedPhrase {
   cue: string
   answer: string
+  ipa?: string
 }
 
 export interface ImportedPhrasePack {
@@ -88,6 +90,7 @@ export interface SessionPhraseResult {
   phraseId: string
   cue: string
   answer: string
+  ipa?: string
   latestRating: RecallRating
   needsReview: boolean
   reviews: SessionResultReview[]

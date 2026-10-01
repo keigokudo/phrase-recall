@@ -325,6 +325,15 @@ footer {
   letter-spacing: -0.03em;
 }
 
+.answer-ipa {
+  max-width: 100%;
+  margin: -2px 0 16px;
+  color: #666159;
+  font-size: clamp(1rem, 2.2vw, 1.25rem);
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
 .answer-tools {
   display: flex;
   align-items: center;
@@ -510,6 +519,8 @@ footer {
 }
 
 .review-history__list h3 { margin: 0 0 5px; }
+
+.review-history__list .answer-ipa { margin: 6px 0 0; font-size: 0.95rem; }
 
 .review-history__list ol { margin: 18px 0 0; padding: 0; list-style: none; }
 

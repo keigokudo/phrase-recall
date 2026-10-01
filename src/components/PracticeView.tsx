@@ -207,6 +207,7 @@ export function PracticeView({
           <div className="answer-block">
             <p className="eyebrow">Answer</p>
             <p className="answer">{phrase.answer}</p>
+            {phrase.ipa && <p className="answer-ipa">{phrase.ipa}</p>}
             <div className="answer-tools">
               <p className="muted">Current status: {progress[phrase.id]?.status ?? 'new'}</p>
               <button className="text-button replay-button" onClick={replayAudio}>Replay audio <span className="key-hint">R</span></button>

@@ -32,6 +32,7 @@ export function buildSessionResultReport(
       phraseId: phrase.id,
       cue: phrase.cue,
       answer: phrase.answer,
+      ...(phrase.ipa ? { ipa: phrase.ipa } : {}),
       latestRating,
       needsReview: latestRating === 'again' || latestRating === 'hard',
       reviews: orderedReviews.map((review) => ({

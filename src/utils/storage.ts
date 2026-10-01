@@ -37,12 +37,19 @@ export function loadImportedPacks(): PhrasePack[] {
     const pack = value as Partial<PhrasePack>
     if (typeof pack.id !== 'string' || typeof pack.name !== 'string' || !Array.isArray(pack.phrases)) return []
 
-    const phrases = pack.phrases.filter((phrase): phrase is Phrase => (
-      Boolean(phrase)
-      && typeof phrase.id === 'string'
-      && typeof phrase.cue === 'string'
-      && typeof phrase.answer === 'string'
-    ))
+    const phrases = pack.phrases.flatMap((value): Phrase[] => {
+      if (
+        !value
+        || typeof value.id !== 'string'
+        || typeof value.cue !== 'string'
+        || typeof value.answer !== 'string'
+      ) return []
+
+      const phrase: Phrase = { id: value.id, cue: value.cue, answer: value.answer }
+      return typeof value.ipa === 'string' && value.ipa.trim()
+        ? [{ ...phrase, ipa: value.ipa }]
+        : [phrase]
+    })
     if (!phrases.length) return []
 
     return [{

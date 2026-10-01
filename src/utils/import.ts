@@ -12,7 +12,8 @@ export const PHRASE_PACK_EXAMPLE = `{
   "phrases": [
     {
       "cue": "English cue",
-      "answer": "French phrase"
+      "answer": "French phrase",
+      "ipa": "/.../"
     }
   ]
 }`
@@ -27,6 +28,11 @@ Rules:
 - Do not include explanations or any text outside the JSON.
 - schemaVersion must be 1.
 - Every phrase must have non-empty cue and answer strings.
+- For each phrase, include an ipa field containing a broad IPA transcription of the answer when pronunciation applies.
+- IPA must represent the answer, not the cue.
+- Use the standard/default pronunciation of the answer language unless the user requests a dialect or accent.
+- Preserve natural connected-speech pronunciation where reasonable.
+- Put IPA only in the ipa field, without explanations. If IPA is not applicable or cannot be provided confidently, omit the field.
 - Use short language identifiers for languages.cue and languages.answer.
 - Do not generate pack IDs, phrase IDs, or timestamps. PhraseRecall generates its own internal IDs.
 - Preserve natural spelling, accents, apostrophes, and punctuation.
@@ -36,11 +42,15 @@ function validateRows(rows: unknown[]): Phrase[] {
   if (!rows.length) throw new Error('The phrase pack does not contain any phrases.')
   return rows.map((row, index) => {
     if (!row || typeof row !== 'object') throw new Error(`Phrase ${index + 1} is not a valid object.`)
-    const { cue, answer } = row as Record<string, unknown>
+    const { cue, answer, ipa } = row as Record<string, unknown>
     if (typeof cue !== 'string' || typeof answer !== 'string' || !cue.trim() || !answer.trim()) {
       throw new Error(`Phrase ${index + 1} must contain non-empty "cue" and "answer" values.`)
     }
-    return { id: createId('phrase'), cue: cue.trim(), answer: answer.trim() }
+    if (ipa !== undefined && (typeof ipa !== 'string' || !ipa.trim())) {
+      throw new Error(`Phrase ${index + 1} "ipa" must be a non-empty string when provided.`)
+    }
+    const phrase: Phrase = { id: createId('phrase'), cue: cue.trim(), answer: answer.trim() }
+    return typeof ipa === 'string' ? { ...phrase, ipa: ipa.trim() } : phrase
   })
 }
 

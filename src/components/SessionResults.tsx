@@ -139,6 +139,7 @@ export function SessionResults({ session, pack, reviews, onBack }: Props) {
             <article key={result.phraseId}>
               <h3>{result.cue}</h3>
               <p className="muted">{result.answer}</p>
+              {result.ipa && <p className="answer-ipa">{result.ipa}</p>}
               <ol>
                 {result.reviews.map((review) => (
                   <li key={review.id}>

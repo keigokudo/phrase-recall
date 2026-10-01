@@ -78,7 +78,12 @@ test('uses the Clipboard API and preserves the exact report text', async () => {
     name: 'French',
     source: 'Lesson',
     languages: { cue: 'en', answer: 'fr' },
-    phrases: [{ id: 'phrase-1', cue: 'What’s this?', answer: 'Qu’est-ce que c’est ?' }],
+    phrases: [{
+      id: 'phrase-1',
+      cue: 'What’s this?',
+      answer: 'Qu’est-ce que c’est ?',
+      ipa: '/kɛs kə sɛ/',
+    }],
   }
   const reviews = [{
     id: 'review-1',
@@ -91,7 +96,8 @@ test('uses the Clipboard API and preserves the exact report text', async () => {
     cueToRevealMs: 2345,
     revealToRatingMs: 987,
   }]
-  const reportText = serializeSessionResult(buildSessionResultReport(session, pack, reviews))
+  const report = buildSessionResultReport(session, pack, reviews)
+  const reportText = serializeSessionResult(report)
   let copiedText = ''
   setGlobal('navigator', { clipboard: { writeText: async (text) => { copiedText = text } } })
 
@@ -101,6 +107,14 @@ test('uses the Clipboard API and preserves the exact report text', async () => {
   assert.match(copiedText, /"summary":/)
   assert.match(copiedText, /"cueToRevealMs": 2345/)
   assert.match(copiedText, /"revealToRatingMs": 987/)
+  assert.equal(report.results[0].ipa, '/kɛs kə sɛ/')
+
+  const packWithoutIpa = {
+    ...pack,
+    phrases: [{ id: 'phrase-1', cue: 'What’s this?', answer: 'Qu’est-ce que c’est ?' }],
+  }
+  const reportWithoutIpa = buildSessionResultReport(session, packWithoutIpa, reviews)
+  assert.equal(Object.hasOwn(reportWithoutIpa.results[0], 'ipa'), false)
 })
 
 test('uses the legacy fallback when the Clipboard API is unavailable', async () => {

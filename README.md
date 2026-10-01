@@ -58,13 +58,14 @@ Paste the returned JSON into PhraseRecall and select **Import pasted JSON**.
   "phrases": [
     {
       "cue": "Do you know him?",
-      "answer": "Tu le connais ?"
+      "answer": "Tu le connais ?",
+      "ipa": "/ty lə kɔ.nɛ/"
     }
   ]
 }
 ```
 
-`name`, `source`, language identifiers, and at least one phrase are included in the preferred schema. `source` may be empty. PhraseRecall generates internal pack and phrase IDs; imported JSON does not need IDs or timestamps. Language identifiers are stored as strings and are not restricted to a fixed list.
+`name`, `source`, language identifiers, and at least one phrase are included in the preferred schema. `source` may be empty. A phrase may include an optional `ipa` transcription of its answer. PhraseRecall generates internal pack and phrase IDs; imported JSON does not need IDs or timestamps. Language identifiers are stored as strings and are not restricted to a fixed list.
 
 Legacy JSON arrays remain supported:
 
