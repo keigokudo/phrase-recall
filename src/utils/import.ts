@@ -66,12 +66,91 @@ function createPack(data: ImportedPhrasePack): PhrasePack {
   }
 }
 
+const JSON_PARSE_ERROR = 'Could not parse the pasted JSON. JSON copied from some mobile apps may use smart quotes; PhraseRecall can correct common cases, but the input may still be malformed.'
+
+function stripJsonFence(text: string): string {
+  const match = text.match(/^```(?:json)?[\t ]*\r?\n([\s\S]*?)\r?\n```$/i)
+  return match ? match[1].trim() : text
+}
+
+function normalizeSmartJsonQuotes(text: string): string {
+  let result = ''
+  let stringDelimiter: 'ascii' | 'smart' | null = null
+  let escaped = false
+
+  for (let index = 0; index < text.length; index += 1) {
+    const character = text[index]
+
+    if (stringDelimiter === 'ascii') {
+      result += character
+      if (escaped) {
+        escaped = false
+      } else if (character === '\\') {
+        escaped = true
+      } else if (character === '"') {
+        stringDelimiter = null
+      }
+      continue
+    }
+
+    if (stringDelimiter === 'smart') {
+      if (escaped) {
+        result += character
+        escaped = false
+        continue
+      }
+      if (character === '\\') {
+        result += character
+        escaped = true
+        continue
+      }
+
+      if (character === '"' || character === '\u201c' || character === '\u201d') {
+        const remainingText = text.slice(index + 1).trimStart()
+        if (!remainingText || ',:}]'.includes(remainingText[0])) {
+          result += '"'
+          stringDelimiter = null
+          continue
+        }
+      }
+
+      result += character
+      continue
+    }
+
+    if (character === '"') {
+      result += character
+      stringDelimiter = 'ascii'
+      continue
+    }
+
+    if (character === '\u201c' || character === '\u201d') {
+      const previousCharacter = result.match(/\S(?=\s*$)/)?.[0]
+      if (!previousCharacter || '{[,:'.includes(previousCharacter)) {
+        result += '"'
+        stringDelimiter = 'smart'
+        continue
+      }
+    }
+
+    result += character
+  }
+
+  return result
+}
+
+export function normalizeJsonForImport(text: string): string {
+  const withoutOuterWhitespace = text.trim().replace(/^\uFEFF/, '').trimStart()
+  const withoutFence = stripJsonFence(withoutOuterWhitespace).replace(/^\uFEFF/, '').trimStart()
+  return normalizeSmartJsonQuotes(withoutFence)
+}
+
 function parseJson(text: string, legacyName: string): PhrasePack {
   let parsed: unknown
   try {
-    parsed = JSON.parse(text)
+    parsed = JSON.parse(normalizeJsonForImport(text))
   } catch {
-    throw new Error('JSON could not be parsed. Check that it contains valid JSON.')
+    throw new Error(JSON_PARSE_ERROR)
   }
 
   if (Array.isArray(parsed)) {
