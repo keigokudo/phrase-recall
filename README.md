@@ -135,3 +135,7 @@ src/
 ## Deliberate limits
 
 PhraseRecall does not currently implement spaced repetition scheduling, speech recognition, accounts, cloud sync, or a full historical-session browser. Completed sessions and review events remain stored locally for future extensions.
+
+## Speech quality
+
+Speech quality and available voices depend on the browser and operating system.
