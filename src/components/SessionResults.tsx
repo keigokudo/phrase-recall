@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { PhrasePack, RecallRating, ReviewEvent, StudySession } from '../types'
+import { copyTextToClipboard } from '../utils/clipboard'
 import { buildSessionResultReport, serializeSessionResult } from '../utils/sessionResults'
 
 interface Props {
@@ -31,6 +32,8 @@ function resultFilename(packName: string, endedAt: string) {
 export function SessionResults({ session, pack, reviews, onBack }: Props) {
   const report = useMemo(() => buildSessionResultReport(session, pack, reviews), [pack, reviews, session])
   const [copyStatus, setCopyStatus] = useState<'idle' | 'copied' | 'error'>('idle')
+  const [manualReport, setManualReport] = useState<string | null>(null)
+  const manualReportRef = useRef<HTMLTextAreaElement>(null)
   const needsReview = report.results.filter((result) => result.needsReview)
   const completedAt = new Intl.DateTimeFormat(undefined, {
     dateStyle: 'medium',
@@ -38,18 +41,31 @@ export function SessionResults({ session, pack, reviews, onBack }: Props) {
   }).format(new Date(report.session.endedAt))
 
   useEffect(() => {
-    if (copyStatus === 'idle') return
+    if (copyStatus !== 'copied') return
     const timeout = window.setTimeout(() => setCopyStatus('idle'), 2200)
     return () => window.clearTimeout(timeout)
   }, [copyStatus])
 
   async function copyAiReport() {
-    try {
-      await navigator.clipboard.writeText(serializeSessionResult(report))
+    const reportText = serializeSessionResult(report)
+    setCopyStatus('idle')
+    setManualReport(null)
+
+    const didCopy = await copyTextToClipboard(reportText)
+    if (didCopy) {
       setCopyStatus('copied')
-    } catch {
+    } else {
+      setManualReport(reportText)
       setCopyStatus('error')
     }
+  }
+
+  function selectManualReport() {
+    const textarea = manualReportRef.current
+    if (!textarea) return
+    textarea.focus()
+    textarea.select()
+    textarea.setSelectionRange(0, textarea.value.length)
   }
 
   function downloadJson() {
@@ -77,7 +93,14 @@ export function SessionResults({ session, pack, reviews, onBack }: Props) {
           <button className="secondary" onClick={downloadJson}>Download JSON</button>
           <button className="text-button" onClick={onBack}>Back to packs</button>
           {copyStatus === 'copied' && <p className="copy-confirmation" role="status">AI report copied</p>}
-          {copyStatus === 'error' && <p className="error" role="alert">Could not copy the AI report.</p>}
+          {copyStatus === 'error' && <p className="error" role="alert">Automatic copy is not available in this browser.</p>}
+          {manualReport !== null && (
+            <div className="manual-copy">
+              <p>Select and copy the report manually.</p>
+              <textarea ref={manualReportRef} value={manualReport} readOnly aria-label="AI report for manual copying" rows={10} />
+              <button className="secondary" type="button" onClick={selectManualReport}>Select report</button>
+            </div>
+          )}
         </div>
       </header>
 

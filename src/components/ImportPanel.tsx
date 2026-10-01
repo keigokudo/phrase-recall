@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import type { PhrasePack } from '../types'
+import { copyTextToClipboard } from '../utils/clipboard'
 import { AI_FORMAT_PROMPT, importPack, importPastedJson, PHRASE_PACK_EXAMPLE } from '../utils/import'
 
 export function ImportPanel({ onImport }: { onImport: (pack: PhrasePack) => void }) {
@@ -55,11 +56,12 @@ export function ImportPanel({ onImport }: { onImport: (pack: PhrasePack) => void
 
   async function copyAiPrompt() {
     setError('')
-    try {
-      await navigator.clipboard.writeText(AI_FORMAT_PROMPT)
+    setCopied(false)
+    const didCopy = await copyTextToClipboard(AI_FORMAT_PROMPT)
+    if (didCopy) {
       setCopied(true)
-    } catch {
-      setError('Could not copy the AI prompt. Check your browser clipboard permissions.')
+    } else {
+      setError('Automatic copy is not available in this browser.')
     }
   }
 

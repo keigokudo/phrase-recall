@@ -423,6 +423,29 @@ footer {
   text-align: right;
 }
 
+.manual-copy {
+  display: grid;
+  flex-basis: 100%;
+  gap: 10px;
+}
+
+.manual-copy p { margin: 0; font-size: 0.9rem; }
+
+.manual-copy textarea {
+  width: 100%;
+  resize: vertical;
+  border: 1px solid #cfcbc2;
+  border-radius: 10px;
+  padding: 12px 13px;
+  background: #fff;
+  color: #1d1d1a;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.75rem;
+  line-height: 1.45;
+}
+
+.manual-copy button { justify-self: start; }
+
 .results-summary {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
