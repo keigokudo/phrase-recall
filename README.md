@@ -136,6 +136,11 @@ src/
 
 PhraseRecall does not currently implement spaced repetition scheduling, speech recognition, accounts, cloud sync, or a full historical-session browser. Completed sessions and review events remain stored locally for future extensions.
 
-## Speech quality
+## Pronunciation
 
-Speech quality and available voices depend on the browser and operating system.
+PhraseRecall uses the browser's built-in Speech Synthesis API for answer pronunciation.
+
+Voice quality and available languages depend on the browser and operating system.
+
+If no suitable voice is installed or exposed by the browser, pronunciation
+quality may be reduced.
