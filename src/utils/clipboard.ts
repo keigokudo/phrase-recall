@@ -26,10 +26,13 @@ function legacyCopy(text: string): boolean {
 }
 
 export async function copyTextToClipboard(text: string): Promise<boolean> {
-  if (typeof navigator !== 'undefined' && typeof navigator.clipboard?.writeText === 'function') {
+  if (typeof navigator !== 'undefined') {
     try {
-      await navigator.clipboard.writeText(text)
-      return true
+      const clipboard = navigator.clipboard
+      if (typeof clipboard?.writeText === 'function') {
+        await clipboard.writeText(text)
+        return true
+      }
     } catch {
       // Continue to the synchronous fallback for browsers with a restricted Clipboard API.
     }

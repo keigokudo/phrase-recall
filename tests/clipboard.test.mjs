@@ -2,17 +2,22 @@ import assert from 'node:assert/strict'
 import test, { afterEach } from 'node:test'
 import { build } from 'vite'
 
-const buildResult = await build({
-  configFile: false,
-  logLevel: 'silent',
-  build: {
-    write: false,
-    lib: { entry: 'src/utils/clipboard.ts', formats: ['es'] },
-  },
-})
-const output = Array.isArray(buildResult) ? buildResult[0].output : buildResult.output
-const moduleCode = output.find((item) => item.type === 'chunk').code
-const { copyTextToClipboard } = await import(`data:text/javascript;base64,${Buffer.from(moduleCode).toString('base64')}`)
+async function importSourceModule(entry) {
+  const buildResult = await build({
+    configFile: false,
+    logLevel: 'silent',
+    build: {
+      write: false,
+      lib: { entry, formats: ['es'] },
+    },
+  })
+  const output = Array.isArray(buildResult) ? buildResult[0].output : buildResult.output
+  const moduleCode = output.find((item) => item.type === 'chunk').code
+  return import(`data:text/javascript;base64,${Buffer.from(moduleCode).toString('base64')}`)
+}
+
+const { copyTextToClipboard } = await importSourceModule('src/utils/clipboard.ts')
+const { buildSessionResultReport, serializeSessionResult } = await importSourceModule('src/utils/sessionResults.ts')
 
 const originalNavigator = Object.getOwnPropertyDescriptor(globalThis, 'navigator')
 const originalDocument = Object.getOwnPropertyDescriptor(globalThis, 'document')
@@ -58,12 +63,44 @@ function installLegacyCopy({ result = true, throws = false } = {}) {
 }
 
 test('uses the Clipboard API and preserves the exact report text', async () => {
-  const reportText = '{\n  "answer": "Qu’est-ce que c’est ?",\n  "cue": "What’s this?"\n}'
+  const session = {
+    id: 'session-1',
+    packId: 'pack-1',
+    packName: 'French',
+    mode: 'full',
+    startedAt: '2026-10-01T10:00:00.000Z',
+    endedAt: '2026-10-01T10:01:00.000Z',
+    state: 'completed',
+  }
+  const pack = {
+    id: 'pack-1',
+    schemaVersion: 1,
+    name: 'French',
+    source: 'Lesson',
+    languages: { cue: 'en', answer: 'fr' },
+    phrases: [{ id: 'phrase-1', cue: 'What’s this?', answer: 'Qu’est-ce que c’est ?' }],
+  }
+  const reviews = [{
+    id: 'review-1',
+    sessionId: 'session-1',
+    packId: 'pack-1',
+    phraseId: 'phrase-1',
+    reviewedAt: '2026-10-01T10:00:30.000Z',
+    round: 1,
+    rating: 'good',
+    cueToRevealMs: 2345,
+    revealToRatingMs: 987,
+  }]
+  const reportText = serializeSessionResult(buildSessionResultReport(session, pack, reviews))
   let copiedText = ''
   setGlobal('navigator', { clipboard: { writeText: async (text) => { copiedText = text } } })
 
   assert.equal(await copyTextToClipboard(reportText), true)
   assert.equal(copiedText, reportText)
+  assert.match(copiedText, /"type": "phrase-recall-session-result"/)
+  assert.match(copiedText, /"summary":/)
+  assert.match(copiedText, /"cueToRevealMs": 2345/)
+  assert.match(copiedText, /"revealToRatingMs": 987/)
 })
 
 test('uses the legacy fallback when the Clipboard API is unavailable', async () => {
@@ -89,7 +126,7 @@ test('attempts the legacy fallback when Clipboard API copying throws', async () 
 
 test('returns false and cleans up when both copy methods fail', async () => {
   setGlobal('navigator', { clipboard: { writeText: async () => { throw new Error('Denied') } } })
-  const { calls } = installLegacyCopy({ throws: true })
+  const { calls } = installLegacyCopy({ result: false })
 
   assert.equal(await copyTextToClipboard('Manual copy text'), false)
   assert.ok(calls.some((call) => call[0] === 'remove'))

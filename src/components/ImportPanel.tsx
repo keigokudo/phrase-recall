@@ -55,9 +55,10 @@ export function ImportPanel({ onImport }: { onImport: (pack: PhrasePack) => void
   }
 
   async function copyAiPrompt() {
+    const copyResult = copyTextToClipboard(AI_FORMAT_PROMPT)
     setError('')
     setCopied(false)
-    const didCopy = await copyTextToClipboard(AI_FORMAT_PROMPT)
+    const didCopy = await copyResult
     if (didCopy) {
       setCopied(true)
     } else {

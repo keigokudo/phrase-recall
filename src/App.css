@@ -415,6 +415,7 @@ footer {
   flex-wrap: wrap;
   justify-content: flex-end;
   gap: 10px;
+  width: 100%;
   max-width: 400px;
 }
 
@@ -427,6 +428,8 @@ footer {
   display: grid;
   flex-basis: 100%;
   gap: 10px;
+  min-width: 0;
+  width: 100%;
 }
 
 .manual-copy p { margin: 0; font-size: 0.9rem; }
@@ -440,7 +443,7 @@ footer {
   background: #fff;
   color: #1d1d1a;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 0.75rem;
+  font-size: 1rem;
   line-height: 1.45;
 }
 

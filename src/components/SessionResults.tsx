@@ -31,6 +31,7 @@ function resultFilename(packName: string, endedAt: string) {
 
 export function SessionResults({ session, pack, reviews, onBack }: Props) {
   const report = useMemo(() => buildSessionResultReport(session, pack, reviews), [pack, reviews, session])
+  const reportText = useMemo(() => serializeSessionResult(report), [report])
   const [copyStatus, setCopyStatus] = useState<'idle' | 'copied' | 'error'>('idle')
   const [manualReport, setManualReport] = useState<string | null>(null)
   const manualReportRef = useRef<HTMLTextAreaElement>(null)
@@ -47,11 +48,11 @@ export function SessionResults({ session, pack, reviews, onBack }: Props) {
   }, [copyStatus])
 
   async function copyAiReport() {
-    const reportText = serializeSessionResult(report)
+    const copyResult = copyTextToClipboard(reportText)
     setCopyStatus('idle')
     setManualReport(null)
 
-    const didCopy = await copyTextToClipboard(reportText)
+    const didCopy = await copyResult
     if (didCopy) {
       setCopyStatus('copied')
     } else {
@@ -69,7 +70,7 @@ export function SessionResults({ session, pack, reviews, onBack }: Props) {
   }
 
   function downloadJson() {
-    const blob = new Blob([serializeSessionResult(report)], { type: 'application/json' })
+    const blob = new Blob([reportText], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url
